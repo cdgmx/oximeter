@@ -4,8 +4,8 @@ const SensorReading = () => {
   const URL = "ws://192.168.5.171:1880/ws/simple";
   const [webSocket, setWebSocket] = useState(null);
   const [socketStatus, setSocketStatus] = useState("disconnected");
-  const [data, setData] = useState("");
-
+  const [spo2, setSpo2] = useState(0);
+  const [pulse, setPulse] = useState(0);
   useEffect(() => {
     setWebSocket(new WebSocket(URL));
   }, []);
@@ -18,9 +18,10 @@ const SensorReading = () => {
       setSocketStatus("connected");
     };
     webSocket.onmessage = function (event) {
-      console.log(event);
-      webSocket.send("from client");
-      setData(event.data);
+      var data = JSON.parse(event.data);
+      console.log(data );
+      setSpo2(data.SpO2);
+      setPulse(data.beatAvg);
     };
     webSocket.onclose = function (event) {
       console.log("Socket is closed. Reconnect will be attempted in 1 second.");
@@ -37,8 +38,13 @@ const SensorReading = () => {
     <div>
       <h1>Socket Status</h1>
       <p>{socketStatus}</p>
-      <h1>Sensor Reading</h1>
-      <p>{data}</p>
+      <h1>Sensor Reading</h1> 
+      <div>
+        <p>Heart Rate: </p>
+        <p>{pulse}</p>
+        <p>SpO2:  </p>
+        <p>{spo2}</p>
+      </div>
     </div>
   );
 };
